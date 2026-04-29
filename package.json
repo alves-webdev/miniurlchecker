@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run dev.ts"
+    "dev": "bun run dev.ts",
+    "benchmark": "bun run benchmark.ts"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.8",
