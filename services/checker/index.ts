@@ -13,7 +13,7 @@ async function startChecker() {
         await channel.assertExchange(EXCHANGE_NAME, 'fanout', { durable: true });
 
 
-        channel.prefetch(1);
+        channel.prefetch(10);
 
         channel.consume(QUEUE_IN, async (msg) => {
             if (msg !== null) {

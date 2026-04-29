@@ -54,6 +54,7 @@ async function main() {
   const { queue: resultQueue } = await ch.assertQueue("", { exclusive: true });
   ch.bindQueue(resultQueue, EXCHANGE, "");
 
+  const benchmarkId = crypto.randomUUID();
   const results: Result[] = [];
 
   let finish!: () => void;
@@ -64,13 +65,14 @@ async function main() {
     (msg) => {
       if (!msg) return;
       const data = JSON.parse(msg.content.toString());
+      ch.ack(msg);
+      if (data.benchmarkId !== benchmarkId) return;
       results.push({
         url: data.url,
         status: data.status,
         responseTime: data.responseTime,
         e2eLatency: Date.now() - data.timestamp,
       });
-      ch.ack(msg);
       process.stdout.write(`\rReceived: ${results.length}/${count}`);
       if (results.length >= count) finish();
     },
@@ -82,7 +84,7 @@ async function main() {
   for (const url of urls) {
     ch.sendToQueue(
       QUEUE_IN,
-      Buffer.from(JSON.stringify({ url, timestamp: Date.now() })),
+      Buffer.from(JSON.stringify({ url, timestamp: Date.now(), benchmarkId })),
       { persistent: true }
     );
   }
