@@ -1,0 +1,19 @@
+{
+  "name": "url-checker",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/amqplib": "^0.10.8",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "amqplib": "^1.0.3"
+  },
+  "workspaces": [
+    "services/*"
+  ]
+}

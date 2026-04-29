@@ -1,0 +1,7 @@
+{
+    "name": "@project/checker",
+    "type": "module",
+    "scripts": {
+        "dev": "bun --watch index.ts"
+    }
+}

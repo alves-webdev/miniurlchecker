@@ -1,0 +1,10 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: uptime-rabbit
+    ports:
+      - "5672:5672"   # Porta para o código se conectar (AMQP)
+      - "15672:15672" # Painel administrativo (http://localhost:15672)
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
