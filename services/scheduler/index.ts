@@ -1,11 +1,10 @@
 import amqp from "amqplib";
-import { Database } from "bun:sqlite";
 
-const db = new Database("uptime.sqlite");
-db.run("CREATE TABLE IF NOT EXISTS sites (id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT)");
-const seed = db.query("SELECT COUNT(*) as count FROM sites").get() as { count: number };
-if (seed.count === 0) {
-    db.run("INSERT INTO sites (url) VALUES (?), (?)", ["https://google.com", "https://github.com"]);
+const SITES_FILE = "./sites.txt";
+
+async function loadSites(): Promise<string[]> {
+    const text = await Bun.file(SITES_FILE).text();
+    return text.split(",").map((u) => u.trim()).filter(Boolean);
 }
 
 async function startScheduler() {
@@ -16,19 +15,14 @@ async function startScheduler() {
         const QUEUE_NAME = "url_checks";
         await channel.assertQueue(QUEUE_NAME, { durable: true });
 
-        const scheduleChecks = () => {
-            const sites = db.query("SELECT * FROM sites").all() as { id: number, url: string }[];
+        const scheduleChecks = async () => {
+            const urls = await loadSites();
 
-            sites.forEach((site) => {
-                const message = JSON.stringify({
-                    id: site.id,
-                    url: site.url,
-                    timestamp: Date.now(),
-                });
-
+            for (const url of urls) {
+                const message = JSON.stringify({ url, timestamp: Date.now() });
                 channel.sendToQueue(QUEUE_NAME, Buffer.from(message), { persistent: true });
-                console.log(`[Sent] → ${site.url}`);
-            });
+                console.log(`[Sent] → ${url}`);
+            }
         };
 
         setInterval(scheduleChecks, 10000);
