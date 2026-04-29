@@ -3,14 +3,16 @@ import amqp from "amqplib";
 
 async function startNotifier() {
     try {
+        const EXCHANGE_NAME = "check_results_exchange";
         const connection = await amqp.connect("amqp://localhost");
         const channel = await connection.createChannel();
 
-        const QUEUE_IN = "check_results";
+        await channel.assertExchange(EXCHANGE_NAME, 'fanout', { durable: true });
 
-        await channel.assertQueue(QUEUE_IN, { durable: true });
+        const q = await channel.assertQueue("", { exclusive: true });
+        channel.bindQueue(q.queue, EXCHANGE_NAME, '');
 
-        channel.consume(QUEUE_IN, (msg) => {
+        channel.consume(q.queue, (msg) => {
             if (msg !== null) {
                 const result = JSON.parse(msg.content.toString());
 

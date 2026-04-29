@@ -6,11 +6,12 @@ async function startChecker() {
         const connection = await amqp.connect("amqp://localhost");
         const channel = await connection.createChannel();
 
+        const EXCHANGE_NAME = "check_results_exchange";
         const QUEUE_IN = "url_checks";
-        const QUEUE_OUT = "check_results";
 
         await channel.assertQueue(QUEUE_IN, { durable: true });
-        await channel.assertQueue(QUEUE_OUT, { durable: true });
+        await channel.assertExchange(EXCHANGE_NAME, 'fanout', { durable: true });
+
 
         channel.prefetch(1);
 
@@ -41,7 +42,7 @@ async function startChecker() {
                     responseTime: duration
                 };
 
-                channel.sendToQueue(QUEUE_OUT, Buffer.from(JSON.stringify(result)));
+                channel.publish(EXCHANGE_NAME, '', Buffer.from(JSON.stringify(result)));
 
                 console.log(`[Finished] ${content.url} - ${status} (${duration}ms)`);
                 channel.ack(msg);
