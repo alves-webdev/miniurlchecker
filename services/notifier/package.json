@@ -1,5 +1,5 @@
 {
-    "name": "@project/checker",
+    "name": "@project/notifier",
     "type": "module",
     "scripts": {
         "dev": "bun --watch index.ts"
