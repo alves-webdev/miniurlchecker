@@ -1,6 +1,7 @@
 const services = [
   { name: "scheduler", path: "./services/scheduler/index.ts", color: "\x1b[36m" },
-  { name: "checker",   path: "./services/checker/index.ts",   color: "\x1b[32m" },
+  { name: "checker-1", path: "./services/checker/index.ts",   color: "\x1b[32m" },
+  { name: "checker-2", path: "./services/checker/index.ts",   color: "\x1b[33m" },
   { name: "notifier",  path: "./services/notifier/index.ts",  color: "\x1b[35m" },
 ];
 
